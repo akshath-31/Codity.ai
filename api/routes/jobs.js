@@ -11,10 +11,6 @@ router.get('/', async (req, res, next) => {
     const offset = parseInt(req.query.offset) || 0;
     const safeLimit = Math.min(limit, 100);
 
-    let query = supabase
-      .from('jobs')
-      .select('*, queues!inner(project_id)', { count: 'exact' });
-
     const { data: allowedProjects } = await supabase
       .from('projects')
       .select('id')
@@ -22,10 +18,22 @@ router.get('/', async (req, res, next) => {
     
     const allowedProjectIds = allowedProjects.map(p => p.id);
     if (allowedProjectIds.length === 0) {
-      return res.json({ data: [], pagination: { total: 0, limit: safeLimit, offset } });
+      return res.json({ data: [], meta: { total: 0, limit: safeLimit, offset } });
     }
 
-    query = query.in('queues.project_id', allowedProjectIds);
+    // Fetch allowed queues to map names and filter by project
+    const { data: allowedQueues } = await supabase
+      .from('queues')
+      .select('id, name')
+      .in('project_id', allowedProjectIds);
+
+    const allowedQueueIds = allowedQueues.map(q => q.id);
+    const queueNameMap = Object.fromEntries(allowedQueues.map(q => [q.id, q.name]));
+
+    let query = supabase
+      .from('jobs')
+      .select('*', { count: 'exact' })
+      .in('queue_id', allowedQueueIds);
 
     if (req.query.status) query = query.eq('status', req.query.status);
     if (req.query.queue_id) query = query.eq('queue_id', req.query.queue_id);
@@ -37,14 +45,15 @@ router.get('/', async (req, res, next) => {
 
     if (error) throw error;
 
-    const sanitizedData = data.map(job => {
-      delete job.queues;
-      return job;
-    });
+    // Attach queue name to each job
+    const enrichedData = data.map(job => ({
+      ...job,
+      queues: { name: queueNameMap[job.queue_id] || 'Unknown' }
+    }));
 
     res.json({
-      data: sanitizedData,
-      pagination: { total: count, limit: safeLimit, offset }
+      data: enrichedData,
+      meta: { total: count, limit: safeLimit, offset }
     });
   } catch (err) {
     next(err);
@@ -54,22 +63,43 @@ router.get('/', async (req, res, next) => {
 // GET /jobs/:id
 router.get('/:id', async (req, res, next) => {
   try {
+    // 1. Get allowed project IDs for the user's org
+    const { data: projects } = await supabase
+      .from('projects')
+      .select('id')
+      .eq('organization_id', req.user.organization_id);
+      
+    const allowedProjectIds = projects.map(p => p.id);
+    if (allowedProjectIds.length === 0) {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Job not found' } });
+    }
+
+    // 2. Get allowed queues
+    const { data: queues } = await supabase
+      .from('queues')
+      .select('id, name')
+      .in('project_id', allowedProjectIds);
+      
+    const allowedQueueIds = queues.map(q => q.id);
+    
+    // 3. Fetch job if it belongs to an allowed queue
     const { data: job, error } = await supabase
       .from('jobs')
       .select(`
         *,
-        queues!inner(projects!inner(organization_id)),
         job_executions (*),
         job_logs (*)
       `)
       .eq('id', req.params.id)
-      .eq('queues.projects.organization_id', req.user.organization_id)
+      .in('queue_id', allowedQueueIds)
       .single();
 
     if (error) throw error;
     if (!job) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Job not found' } });
 
-    delete job.queues;
+    // Attach queue name for frontend compatibility
+    job.queues = { name: queues.find(q => q.id === job.queue_id)?.name || 'Unknown' };
+
     res.json(job);
   } catch (err) {
     next(err);
@@ -159,11 +189,31 @@ router.post('/batch', validate(createBatchSchema), async (req, res, next) => {
 // POST /jobs/:id/retry
 router.post('/:id/retry', async (req, res, next) => {
   try {
+    // 1. Get allowed project IDs for the user's org
+    const { data: projects } = await supabase
+      .from('projects')
+      .select('id')
+      .eq('organization_id', req.user.organization_id);
+      
+    const allowedProjectIds = projects.map(p => p.id);
+    if (allowedProjectIds.length === 0) {
+      return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Job not found' } });
+    }
+
+    // 2. Get allowed queues
+    const { data: queues } = await supabase
+      .from('queues')
+      .select('id')
+      .in('project_id', allowedProjectIds);
+      
+    const allowedQueueIds = queues.map(q => q.id);
+
+    // 3. Fetch job if it belongs to an allowed queue
     const { data: job, error: fetchError } = await supabase
       .from('jobs')
-      .select('*, queues!inner(projects!inner(organization_id))')
+      .select('*')
       .eq('id', req.params.id)
-      .eq('queues.projects.organization_id', req.user.organization_id)
+      .in('queue_id', allowedQueueIds)
       .single();
 
     if (fetchError || !job) {

@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-black font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .shadow-brutal {
+    box-shadow: 4px 4px 0px 0px #000;
+  }
+  .shadow-brutal-sm {
+    box-shadow: 2px 2px 0px 0px #000;
+  }
+  .shadow-brutal-hover {
+    box-shadow: 5px 5px 0px 0px #000;
+  }
+}

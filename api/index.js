@@ -10,6 +10,7 @@ const jobsRouter = require('./routes/jobs');
 const scheduledJobsRouter = require('./routes/scheduledJobs');
 const batchesRouter = require('./routes/batches');
 const workersRouter = require('./routes/workers');
+const dashboardRouter = require('./routes/dashboard');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +29,7 @@ app.use('/jobs', jobsRouter);
 app.use('/scheduled-jobs', scheduledJobsRouter);
 app.use('/batches', batchesRouter);
 app.use('/workers', workersRouter);
+app.use('/dashboard', dashboardRouter);
 
 // Global Error Handler
 app.use(errorHandler);
