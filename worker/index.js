@@ -178,6 +178,15 @@ async function pollForJobs() {
       }
     }
 
+    // 7. Update batch status if part of a batch
+    if (job.batch_id) {
+      try {
+        await supabase.rpc('update_batch_status', { p_batch_id: job.batch_id });
+      } catch (err) {
+        console.error(`[Worker] Failed to update batch status for batch ${job.batch_id}:`, err);
+      }
+    }
+
   } catch (error) {
     console.error(`[Worker] Polling error:`, error);
   } finally {
