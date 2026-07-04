@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "test": "npm --prefix worker test && npm --prefix api test"
+  },
+  "devDependencies": {
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.9"
+  }
+}

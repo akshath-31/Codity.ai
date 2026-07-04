@@ -4,7 +4,8 @@
   "description": "Standalone Node.js worker for Supabase queues",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

@@ -3,7 +3,7 @@ const { z } = require('zod');
 const createJobSchema = z.object({
   queue_id: z.string().uuid(),
   job_type: z.enum(['immediate', 'delayed', 'scheduled', 'batch']),
-  payload: z.any().optional().default({}),
+  payload: z.any(),
   scheduled_for: z.string().datetime().optional(),
   priority: z.number().int().optional().default(0),
   max_attempts: z.number().int().min(1).optional().default(3),
