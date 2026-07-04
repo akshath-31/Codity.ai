@@ -3,6 +3,7 @@
  */
 async function executeJob(job) {
   console.log(`[JobHandler] Executing job ${job.id} of type ${job.job_type}`);
+  console.log(`[JobHandler] Payload:`, job.payload);
   
   // Real implementation goes here
   
