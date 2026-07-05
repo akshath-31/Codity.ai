@@ -24,23 +24,26 @@ Codity is a robust, highly-concurrent distributed job scheduler built natively o
 
 ## Screenshots
 
-### 1. Login
-![Login Screen](images/ss1.png)
-
-### 2. Dashboard Overview
-![Dashboard Overview](images/ss2.png)
-
-### 3. Queue Management
-![Queue Management](images/ss3.png)
-
-### 4. Job Explorer
-![Job Explorer](images/ss4.png)
-
-### 5. Worker Nodes
-![Worker Nodes](images/ss5.png)
-
-### 6. Batch Operations
-![Batch Operations](images/ss6.png)
+<table>
+  <tr>
+    <td align="center"><img src="images/ss1.png" width="400"/><br/>
+    <sub><b>Login</b></sub></td>
+    <td align="center"><img src="images/ss2.png" width="400"/><br/>
+    <sub><b>Dashboard Overview</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="images/ss3.png" width="400"/><br/>
+    <sub><b>Queue Management</b></sub></td>
+    <td align="center"><img src="images/ss4.png" width="400"/><br/>
+    <sub><b>Job Explorer</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="images/ss5.png" width="400"/><br/>
+    <sub><b>Worker Nodes</b></sub></td>
+    <td align="center"><img src="images/ss6.png" width="400"/><br/>
+    <sub><b>Batch Operations</b></sub></td>
+  </tr>
+</table>
 
 ## Tech Stack
 
