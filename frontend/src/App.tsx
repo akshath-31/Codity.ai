@@ -9,15 +9,6 @@ import Queues from './pages/Queues'
 import Workers from './pages/Workers'
 import Batches from './pages/Batches'
 
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="flex h-full items-center justify-center">
-      <div className="text-4xl font-black uppercase text-gray-300 transform -rotate-2">
-        {title} (Coming Soon)
-      </div>
-    </div>
-  )
-}
 
 function App() {
   return (

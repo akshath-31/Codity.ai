@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { supabase } from '../lib/supabase';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
-import { Search, ChevronLeft, ChevronRight, Filter, RefreshCw } from 'lucide-react';
+import { Card, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { ChevronLeft, ChevronRight, Filter, RefreshCw } from 'lucide-react';
 
 interface Job {
   id: string;
@@ -94,7 +94,7 @@ export default function JobsExplorer() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'jobs' },
-        (payload) => {
+        () => {
            // We might not want to instantly insert on page 1 without refetching,
            // but we can show a toast or auto-refresh if on page 1 and no filters.
            if (page === 1 && !statusFilter && !typeFilter && !queueFilter) {
