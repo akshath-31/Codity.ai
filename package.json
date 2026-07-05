@@ -1,9 +1,14 @@
 {
   "scripts": {
-    "test": "npm --prefix worker test && npm --prefix api test"
+    "test": "npm --prefix worker test && npm --prefix api test",
+    "install:all": "npm install && npm --prefix api install && npm --prefix worker install && npm --prefix scheduler install",
+    "start": "concurrently \"npm --prefix api start\" \"npm --prefix worker start\" \"npm --prefix scheduler start\""
   },
   "devDependencies": {
     "supertest": "^7.2.2",
     "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "concurrently": "^10.0.3"
   }
 }
